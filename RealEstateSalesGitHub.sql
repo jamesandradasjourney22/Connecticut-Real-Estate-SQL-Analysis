@@ -69,7 +69,7 @@ GROUP BY
 HAVING COUNT(*) > 1;
 
 
------------------------------------------------------------
+-----------------------------------------------------------------
 -- Conneticut real estate data insights
 
 
@@ -109,16 +109,16 @@ FROM realestatesales
 GROUP BY property_type
 ORDER BY avg_assessed_value DESC;
 
--- LIMITATION OF DATA/ DATA ENTRY ERROR: The average assessed value for properties categorized with an empty space ('') as their property type is $316,329.67. 
--- It would be beneficial to determine the specific property types associated with these instances, as this could provide additional insights about the data.
+-- LIMITATION OF DATA/ DATA ENTRY ERROR: The average assessed value for properties categorized with an empty space ('') as their property type is $316,329.67. It would be beneficial to determine the specific property types associated with these instances, as this could provide additional insights about the data.
 
 
 -- 4. High sales-ratio properties
--- Definition/exlanation: An optimal sales ratio typically falls within the range of 1 to 2. 
--- A higher ratio signifies that the market demonstrates a willingness to allocate more dollars for each unit of annual sales, suggesting a potentially robust demand for the property.
+-- Definition/exlanation: Genrally speaking, an optimal sales ratio typically falls within the range of 1 to 2. 
+-- A lower price to sales ratio is considered favorable as it indicates undervaluation. 
+-- More specifically, if the ratio is less than one, it is considered good and anything above 4 is a warning sign that the company is overvalued.
 
 -- LIMITATION OF DATA or POTENTIAL DATA ENTRY ERROR and/or POTENTIAL OUTLIERS: A total of 6048 properties within the dataset exhibit a sales ratio exceeding 20. 
--- This observation prompts consideration of potential outliers or data input anomalies, which could contribute to such higher-than-expected sales ratios.
+--This observation prompts consideration of potential outliers or data input anomalies, which could contribute to such higher-than-expected sales ratios.
 SELECT town, address, sale_amount, assessed_value, sales_ratio
 FROM realestatesales
 WHERE sales_ratio > 1.5
@@ -128,8 +128,10 @@ SELECT COUNT(*)
 FROM realestatesales
 WHERE sales_ratio > 20;
 
--- LIMITATION OF DATA or POTENTIAL DATA ENTRY ERROR: The dataset's owner stipulated the inclusion of real estate sales listings with sale prices exceeding $2000.
--- However, the dataset currently contains 2,139 records with sale prices below this threshold. Among these records, 1,871 instances feature sale prices below $100. Given the unusual nature of real estate transactions involving sale prices below $100, it is advisable to thoroughly investigate these specific records for potential anomalies or irregularities.
+-- LIMITATION OF DATA or POTENTIAL DATA ENTRY ERROR: The dataset's owner stipulated the inclusion of real estate sales listings with sale prices exceeding $2000. 
+-- However, the dataset currently contains 2,139 records with sale prices below this threshold. 
+-- Among these records, 1,871 instances feature sale prices below $100. 
+-- Given the unusual nature of real estate transactions involving sale prices below $100, it is advisable to thoroughly investigate these specific records for potential anomalies or irregularities.
 
 -- The number of properties where the sale amount was less than $2000.
 SELECT COUNT(*) FROM realestatesales
@@ -145,9 +147,9 @@ FROM realestatesales
 WHERE sale_amount < 2000
 ORDER BY sale_amount DESC;
 
+
 -- POTENTIAL DATA ENTRY ERROR: A notable number of properties exhibit exceptionally high sales ratios, yet these properties lack both a designated property type and a specified residential type. 
 -- The presence of an assessed value for real estate without defined property or residential classifications prompts inquiry into the rationale behind such classification.
-
 SELECT property_type, residential_type, sales_ratio, assessed_value
 FROM realestatesales
 WHERE property_type = ''
@@ -163,19 +165,18 @@ FROM realestatesales
 GROUP BY list_year
 ORDER BY list_year;
 
-
 -- 6. Most expensive property sales
 SELECT town, address, residential_type, list_year, FORMAT(sale_amount,2)
 FROM realestatesales
 ORDER BY sale_amount DESC
 LIMIT 2000;
 
--- POTENTIAL DATA ENTRY ERROR: The scenario where numerous properties within close proximity on the same street achieve substantial pricing levels poses a challenging perspective.
--- Furthermore, the inclusion of asterisks or hashtags within select addresses, which frequently signify unit-based properties like apartments, condos, and office spaces, introduces intricacies to comprehending these transactions. 
+-- POTENTIAL DATA ENTRY ERROR: The scenario where numerous properties within close proximity on the same street achieve substantial pricing levels poses a challenging perspective. 
+-- Furthermore, the inclusion of asterisks or hashtags within select addresses, which frequently signify unit-based properties like apartments, condos, and office spaces, introduces intricacies to comprehending these transactions.
 -- With this, the idea of individual units attaining sales in the tens or hundreds of millions of dollars instigates inquiries that warrant a thorough investigation. The subsequent SQL queries provide specific instances for reference.
 
--- 6A Example 1: It's quite surprising to find multiple properties along the same road with valuations exceeding $72,000,000.
--- To enhance credibility, one might find it more plausible that the property situated at 93 Glenbrook Road has an overall valuation of $72,000,000, with each individual unit holding a distinct, likely lower, value. To improve the representation of this, you might consider omitting the sale amounts for each individual unit within the same property, and instead, opt to either retain only the building's address or accurately adjust the sale amounts to reflect the true worth of each property unit. Run the following query to see the example. 
+-- 6A Example 1: It's quite surprising to find multiple properties along the same road with valuations exceeding $72,000,000. To enhance credibility, one might find it more plausible that the property situated at 93 Glenbrook Road has an overall valuation of $72,000,000, with each individual unit holding a distinct, likely lower, value. 
+-- To improve the representation of this, you might consider omitting the sale amounts for each individual unit within the same property, and instead, opt to either retain only the building's address or accurately adjust the sale amounts to reflect the true worth of each property unit. Run the following query to see the example. 
 SELECT town, address, FORMAT(sale_amount,2), property_type
 FROM realestatesales 
 WHERE address LIKE '93 GLENBROOK ROAD%';
@@ -196,7 +197,8 @@ ORDER BY avg_sale_amount DESC;
 
 -- Data Entry Error: The dataset presents an intriguing finding: the average sale amount for properties categorized with a residential type of an empty space ('') is calculated at $423,099.28. 
 -- Delving deeper into the data entry that led to this figure could unveil valuable insights and shed light on the underlying factors contributing to this unexpected number. 
--- Furthermore, as stated earlier, there are four properties with a NULL value in the residential_type field. These four properties exhibit an average sale amount of $127,100. This particular observation warrants investigation, as the absence of residential type information alongside the distinct average sale amount for these properties could potentially reveal a unique market trend or data phenomenon deserving of closer examination.
+-- Furthermore, as stated earlier, there are four properties with a NULL value in the residential_type field. These four properties exhibit an average sale amount of $127,100. 
+-- This particular observation warrants investigation, as the absence of residential type information alongside the distinct average sale amount for these properties could potentially reveal a unique market trend or data phenomenon deserving of closer examination.
 
 
 -- 8. High-value sales by year and property type
@@ -260,8 +262,7 @@ WHERE EXTRACT(YEAR FROM date_recorded) < list_year;
 -- These groups typically share common characteristics within a defined time-span. 
 -- In this case, the cohort is the town and the time-span is the year the property was sold. 
 
--- In the example below, we are analyzing the distribution of property types for each town over time. 
--- This will allow you to see how property type preferences evolve within different towns.
+-- In the example below, we are analyzing the distribution of property types for each town over time. This will allow you to see how property type preferences evolve within different towns.
 SELECT
     town,
     property_type,
